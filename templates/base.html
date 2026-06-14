@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart City Traffic Control Center</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar text-white" id="sidebar-wrapper">
+            <div class="sidebar-heading text-center py-4 fs-4 fw-bold border-bottom">
+                <i class="fa-solid fa-satellite-dish me-2 text-success glow-icon"></i>
+                <span class="orbitron">COMMAND<br>CENTER</span>
+            </div>
+            <div class="list-group list-group-flush mt-3">
+                <a href="{{ url_for('dashboard.index') }}" class="list-group-item list-group-item-action bg-transparent text-white px-4 py-3 border-0 active-nav">
+                    <i class="fa-solid fa-gauge me-2"></i> Dashboard
+                </a>
+                <a href="{{ url_for('dashboard.analytics') }}" class="list-group-item list-group-item-action bg-transparent text-white px-4 py-3 border-0">
+                    <i class="fa-solid fa-chart-line me-2"></i> Analytics
+                </a>
+                <a href="{{ url_for('dashboard.logs') }}" class="list-group-item list-group-item-action bg-transparent text-white px-4 py-3 border-0">
+                    <i class="fa-solid fa-clipboard-list me-2"></i> Logs
+                </a>
+            </div>
+            <div class="sidebar-footer position-absolute bottom-0 w-100 text-center pb-3">
+                <small class="text-muted">AI Model: YOLOv8<br>System: ACTIVE</small>
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper" class="w-100">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-transparent border-bottom">
+                <div class="container-fluid">
+                    <button class="btn btn-outline-light" id="menu-toggle"><i class="fa-solid fa-bars"></i></button>
+                    <div class="ms-auto d-flex align-items-center gap-3">
+                        <span class="badge bg-success glow-badge"><i class="fa-solid fa-circle-check me-1"></i> System Online</span>
+                        <div class="datetime-display orbitron text-info" id="clock">00:00:00</div>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container-fluid p-4">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Clock script
+        setInterval(() => {
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+        }, 1000);
+        
+        // Sidebar toggle
+        document.getElementById("menu-toggle").addEventListener("click", function(e) {
+            e.preventDefault();
+            document.getElementById("wrapper").classList.toggle("toggled");
+        });
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

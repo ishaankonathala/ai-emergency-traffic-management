@@ -1,0 +1,15 @@
+from flask import Blueprint, render_template
+
+dashboard_bp = Blueprint('dashboard', __name__)
+
+@dashboard_bp.route('/')
+def index():
+    return render_template('dashboard.html')
+
+@dashboard_bp.route('/analytics')
+def analytics():
+    return render_template('analytics.html')
+
+@dashboard_bp.route('/logs')
+def logs():
+    return render_template('logs.html')

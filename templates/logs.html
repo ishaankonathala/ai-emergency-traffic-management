@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="fw-bold mb-0">System Logs</h2>
+            <p class="text-muted">Detailed emergency detection history</p>
+        </div>
+        <button class="btn btn-outline-info" onclick="loadLogs()"><i class="fa-solid fa-rotate-right me-2"></i> Refresh</button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card glass-card border-0 shadow">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover mb-0 text-center custom-table">
+                        <thead class="bg-darker">
+                            <tr>
+                                <th class="py-3">Timestamp</th>
+                                <th class="py-3">Vehicle Type</th>
+                                <th class="py-3">Confidence</th>
+                                <th class="py-3">Action Taken</th>
+                                <th class="py-3">Junction Activated</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logs-table-body">
+                            <tr><td colspan="5" class="py-4 text-muted">Loading logs...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function loadLogs() {
+        const tbody = document.getElementById('logs-table-body');
+        fetch('/api/logs')
+            .then(response => response.json())
+            .then(data => {
+                tbody.innerHTML = '';
+                if(data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="py-4 text-muted">No logs found in database.</td></tr>';
+                    return;
+                }
+                data.forEach(log => {
+                    let badgeColor = 'bg-secondary';
+                    if (log.vehicle_type === 'ambulance') badgeColor = 'bg-danger';
+                    else if (log.vehicle_type === 'police_car') badgeColor = 'bg-primary';
+                    else if (log.vehicle_type === 'fire_truck') badgeColor = 'bg-warning text-dark';
+
+                    const row = `<tr>
+                        <td class="py-3 text-muted orbitron">${log.timestamp}</td>
+                        <td class="py-3"><span class="badge ${badgeColor}">${log.vehicle_type.replace('_', ' ').toUpperCase()}</span></td>
+                        <td class="py-3 orbitron">${(log.confidence * 100).toFixed(1)}%</td>
+                        <td class="py-3 text-success fw-bold">${log.action_taken}</td>
+                        <td class="py-3">${log.junction_activated || '-'}</td>
+                    </tr>`;
+                    tbody.innerHTML += row;
+                });
+            });
+    }
+
+    document.addEventListener("DOMContentLoaded", loadLogs);
+</script>
+{% endblock %}

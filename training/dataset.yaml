@@ -1,0 +1,20 @@
+# Roboflow/Kaggle-compatible YOLOv8 dataset configuration.
+# Expected structure:
+# dataset/
+#   train/images, train/labels
+#   valid/images, valid/labels
+#   test/images, test/labels
+#
+# Label format (YOLO txt, one object per line):
+# <class_id> <x_center> <y_center> <width> <height>
+# All coordinates are normalized (0 to 1).
+
+path: ../dataset
+train: train/images
+val: valid/images
+test: test/images
+
+names:
+  0: ambulance
+  1: police_car
+  2: fire_truck

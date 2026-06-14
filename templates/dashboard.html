@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-8">
+        <h2 class="fw-bold mb-0 text-white"><i class="fa-solid fa-satellite-dish text-primary me-2"></i> COMMAND CENTER</h2>
+        <p class="text-muted mb-0">Single-Camera City Infrastructure & Emergency Synchronization</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <span class="badge bg-success p-2 fs-6"><i class="fa-solid fa-circle-check me-1"></i> NETWORK ONLINE</span>
+    </div>
+</div>
+
+<!-- Alert Banner -->
+<div id="alert-banner" class="alert alert-danger d-none shadow-lg border-danger fw-bold" role="alert">
+    <div class="d-flex justify-content-between align-items-center">
+        <span><i class="fa-solid fa-triangle-exclamation fa-fade me-2"></i> <span id="alert-text">EMERGENCY VEHICLE DETECTED</span></span>
+        <span class="badge bg-danger text-white fs-6" id="obs-alert-text"></span>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Main Video Grid -->
+    <div class="col-xl-8 col-lg-7 mb-4">
+        <div class="card bg-dark border-secondary shadow-lg">
+            <div class="card-header border-secondary d-flex justify-content-between align-items-center bg-black">
+                <span class="fw-bold text-white"><i class="fa-solid fa-video text-danger me-2"></i> Live Surveillance Feed</span>
+                <span class="badge bg-secondary" id="grid-fps">FPS: 0.0</span>
+            </div>
+            <div class="card-body p-0 position-relative bg-black">
+                <div class="ratio ratio-4x3">
+                    <img id="video-feed" src="{{ url_for('stream.video_feed') }}" class="img-fluid w-100" alt="Camera Stream" style="object-fit: contain;">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dynamic UI Green Corridor Visualizer -->
+        <div class="card bg-dark border-secondary shadow mt-4">
+            <div class="card-body">
+                <h5 class="mb-4 fw-bold text-white"><i class="fa-solid fa-route text-success me-2"></i> Dynamic Synchronized Corridor</h5>
+                
+                <div class="d-flex justify-content-between align-items-center position-relative px-4" id="junction-visualizer">
+                    <!-- Line connecting junctions -->
+                    <div class="position-absolute top-50 start-0 w-100 bg-secondary" style="height: 4px; z-index: 1; transform: translateY(-50%);"></div>
+                    <div class="position-absolute top-50 start-0 bg-success corridor-progress" id="corridor-progress-line" style="height: 4px; z-index: 2; width: 0%; transform: translateY(-50%); transition: width 0.5s;"></div>
+                    
+                    <!-- Junctions -->
+                    <div class="junction-node position-relative text-center text-white" style="z-index: 3;" id="node-Junction A">
+                        <div class="signal-indicator bg-black border border-2 border-secondary rounded-circle d-inline-block p-3 mb-2 shadow" id="signal-Junction A"></div>
+                        <div class="fw-bold">Junction A</div>
+                        <div class="small timer-text orbitron text-warning" id="timer-Junction A">0s</div>
+                    </div>
+                    <div class="junction-node position-relative text-center text-white" style="z-index: 3;" id="node-Junction B">
+                        <div class="signal-indicator bg-black border border-2 border-secondary rounded-circle d-inline-block p-3 mb-2 shadow" id="signal-Junction B"></div>
+                        <div class="fw-bold">Junction B</div>
+                        <div class="small timer-text orbitron text-warning" id="timer-Junction B">0s</div>
+                    </div>
+                    <div class="junction-node position-relative text-center text-white" style="z-index: 3;" id="node-Junction C">
+                        <div class="signal-indicator bg-black border border-2 border-secondary rounded-circle d-inline-block p-3 mb-2 shadow" id="signal-Junction C"></div>
+                        <div class="fw-bold">Junction C</div>
+                        <div class="small timer-text orbitron text-warning" id="timer-Junction C">0s</div>
+                    </div>
+                    <div class="junction-node position-relative text-center text-white" style="z-index: 3;" id="node-Junction D">
+                        <div class="signal-indicator bg-black border border-2 border-secondary rounded-circle d-inline-block p-3 mb-2 shadow" id="signal-Junction D"></div>
+                        <div class="fw-bold">Junction D</div>
+                        <div class="small timer-text orbitron text-warning" id="timer-Junction D">0s</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Sidebar Panels -->
+    <div class="col-xl-4 col-lg-5">
+        
+        <!-- Emergency Telemetry -->
+        <div class="card bg-dark border-secondary mb-4 shadow">
+            <div class="card-header bg-black border-secondary text-white fw-bold">
+                <i class="fa-solid fa-truck-medical text-danger me-2"></i> Emergency Telemetry
+            </div>
+            <div class="card-body text-white">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Target Status:</span>
+                    <span class="fw-bold text-danger" id="stat-emergency">None</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Predicted Route:</span>
+                    <span class="fw-bold text-info" id="stat-route">Calculating...</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Estimated ETA:</span>
+                    <span class="fw-bold text-warning"><span id="stat-eta">0</span> seconds</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted">Obstruction Status:</span>
+                    <span class="badge bg-success" id="stat-obstruction">CLEAR</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Simulation Controls -->
+        <div class="card bg-dark border-secondary shadow">
+            <div class="card-header bg-black border-secondary text-white fw-bold">
+                <i class="fa-solid fa-gamepad text-primary me-2"></i> Simulation Controller
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-3">Trigger emergency events to test multi-camera coordination and predictive routing.</p>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-danger" onclick="simulateEvent('ambulance')">
+                        <i class="fa-solid fa-truck-medical me-2"></i> Simulate Ambulance
+                    </button>
+                    <button class="btn btn-outline-primary" onclick="simulateEvent('police_car')">
+                        <i class="fa-solid fa-truck-fast me-2"></i> Simulate Police
+                    </button>
+                    <button class="btn btn-outline-warning" onclick="simulateEvent('fire_truck')">
+                        <i class="fa-solid fa-fire-extinguisher me-2"></i> Simulate Fire Truck
+                    </button>
+                    <hr class="border-secondary my-2">
+                    <button class="btn btn-outline-light" onclick="resetSystem()">
+                        <i class="fa-solid fa-rotate-right me-2"></i> Reset Global System
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

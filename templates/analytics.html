@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="fw-bold mb-0">System Analytics</h2>
+        <p class="text-muted">Historical data and response frequencies</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card glass-card border-0 h-100 shadow">
+            <div class="card-body">
+                <h5 class="fw-bold text-center mb-4">Emergency Vehicles Detected</h5>
+                <canvas id="emergencyChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card glass-card border-0 h-100 shadow">
+            <div class="card-body">
+                <h5 class="fw-bold text-center mb-4">System Actions Taken</h5>
+                <canvas id="actionsChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card glass-card border-0 shadow">
+            <div class="card-body text-center p-5">
+                <h1 class="display-4 fw-bold text-success" id="total-emergencies">0</h1>
+                <h5 class="text-muted text-uppercase">Total Emergency Events Processed</h5>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch('/api/analytics')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('total-emergencies').innerText = data.total_emergencies;
+
+                const ctxEmergency = document.getElementById('emergencyChart').getContext('2d');
+                new Chart(ctxEmergency, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Ambulance', 'Police Car', 'Fire Truck'],
+                        datasets: [{
+                            data: [
+                                data.vehicle_counts.ambulance, 
+                                data.vehicle_counts.police_car, 
+                                data.vehicle_counts.fire_truck
+                            ],
+                            backgroundColor: ['#dc3545', '#0d6efd', '#fd7e14'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        plugins: { legend: { labels: { color: '#fff' } } }
+                    }
+                });
+
+                const actionLabels = Object.keys(data.action_counts);
+                const actionData = Object.values(data.action_counts);
+
+                const ctxActions = document.getElementById('actionsChart').getContext('2d');
+                new Chart(ctxActions, {
+                    type: 'bar',
+                    data: {
+                        labels: actionLabels.length > 0 ? actionLabels : ['No Data'],
+                        datasets: [{
+                            label: 'Actions',
+                            data: actionData.length > 0 ? actionData : [0],
+                            backgroundColor: '#198754',
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: { beginAtZero: true, ticks: { color: '#adb5bd' }, grid: { color: '#343a40' } },
+                            x: { ticks: { color: '#adb5bd' }, grid: { display: false } }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            });
+    });
+</script>
+{% endblock %}
